@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jamu CMS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0a0c0f;
+    --bg2: #111318;
+    --bg3: #1a1d24;
+    --bg4: #22262f;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --accent: #00d4aa;
+    --accent2: #00a882;
+    --text: #e2e8f0;
+    --text2: #8892a4;
+    --text3: #4a5568;
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --success: #34d399;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    min-height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+  }
+
+  .logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-icon { font-size: 24px; }
+  .logo-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+    margin-top: 4px;
+  }
+  .logo-sub {
+    font-size: 10px;
+    color: var(--text3);
+    font-family: var(--mono);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav { padding: 12px 8px; flex: 1; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    transition: all 0.15s;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+  }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active {
+    background: rgba(0,212,170,0.1);
+    color: var(--accent);
+    border-color: rgba(0,212,170,0.2);
+  }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .pat-status {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pat-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text3);
+  }
+  .pat-dot.ok { background: var(--success); }
+
+  /* Main */
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .page-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+  .page-sub {
+    font-size: 12px;
+    color: var(--text2);
+    font-family: var(--mono);
+    margin-top: 2px;
+  }
+
+  .content { padding: 32px; flex: 1; }
+
+  /* Cards */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .card-body { padding: 20px; }
+
+  /* Forms */
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+    margin-bottom: 6px;
+    font-family: var(--mono);
+  }
+  input[type=text], input[type=password], textarea, select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+  }
+  textarea { resize: vertical; min-height: 100px; }
+  select option { background: var(--bg3); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: var(--sans);
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+  .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid rgba(248,113,113,0.3);
+  }
+  .btn-danger:hover { background: rgba(248,113,113,0.1); }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* Table */
+  .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--mono);
+    border-bottom: 1px solid var(--border);
+  }
+  .table td {
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .table tr:last-child td { border-bottom: none; }
+  .table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--success); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--danger); }
+  .badge-yellow { background: rgba(251,191,36,0.12); color: var(--warn); }
+  .badge-gray { background: rgba(255,255,255,0.06); color: var(--text2); }
+  .badge-teal { background: rgba(0,212,170,0.1); color: var(--accent); }
+
+  /* Alert */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .alert-success { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2); color: var(--success); }
+  .alert-error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2); color: var(--danger); }
+  .alert-info { background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.15); color: var(--accent); }
+
+  /* Toggle */
+  .toggle {
+    position: relative;
+    width: 36px; height: 20px;
+    cursor: pointer;
+  }
+  .toggle input { display: none; }
+  .toggle-track {
+    width: 36px; height: 20px;
+    background: var(--bg4);
+    border-radius: 10px;
+    transition: background 0.2s;
+    border: 1px solid var(--border2);
+  }
+  .toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 14px; height: 14px;
+    background: var(--text2);
+    border-radius: 50%;
+    transition: all 0.2s;
+  }
+  .toggle input:checked ~ .toggle-thumb { left: 19px; background: #000; }
+
+  /* Code */
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text2);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  /* Page sections */
+  .section { margin-bottom: 28px; }
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--mono);
+    margin-bottom: 12px;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(0,212,170,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Separator */
+  .sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: none;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    width: 560px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title { font-size: 15px; font-weight: 600; }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+  }
+  .modal-body { padding: 24px; }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* Row actions */
+  .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+  /* Hidden */
+  .hidden { display: none !important; }
+
+  /* Toast */
+  #toast-container {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toast {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: var(--mono);
+    animation: slideIn 0.2s ease;
+    min-width: 260px;
+  }
+  .toast-success { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+  .toast-error { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
+  .toast-info { background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.2); color: var(--accent); }
+  @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* Converter specific */
+  .output-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+  .output-tab {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .output-tab:hover { color: var(--text); }
+  .output-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .output-pane { display: none; }
+  .output-pane.active { display: block; }
+
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8,1fr);
+    gap: 2px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .emoji-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.1s;
+  }
+  .emoji-btn:hover { background: var(--bg4); }
+
+  .warn-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: var(--mono);
+    margin-bottom: 6px;
+  }
+  .warn-error { background: rgba(248,113,113,0.08); color: var(--danger); border-left: 3px solid var(--danger); }
+  .warn-warn { background: rgba(251,191,36,0.08); color: var(--warn); border-left: 3px solid var(--warn); }
+  .warn-info { background: rgba(0,212,170,0.08); color: var(--accent); border-left: 3px solid var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🍵</div>
+    <div class="logo-title">Jamu CMS</div>
+    <div class="logo-sub">v1.0.0</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="showPage('settings')" id="nav-settings">
+      <span class="nav-icon">⚙️</span> Pengaturan
+    </div>
+    <div class="nav-item" onclick="showPage('modules')" id="nav-modules">
+      <span class="nav-icon">🧩</span> Modul
+    </div>
+    <div class="nav-item" onclick="showPage('manifest')" id="nav-manifest">
+      <span class="nav-icon">📋</span> Manifest
+    </div>
+    <div class="nav-item" onclick="showPage('whitelist')" id="nav-whitelist">
+      <span class="nav-icon">🛡️</span> Whitelist
+    </div>
+    <div class="nav-item" onclick="showPage('converter')" id="nav-converter">
+      <span class="nav-icon">🔄</span> Converter
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="pat-status">
+      <div class="pat-dot" id="pat-dot"></div>
+      <span id="pat-status-text">PAT belum dikonfigurasi</span>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- SETTINGS PAGE -->
+  <div id="page-settings">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Pengaturan</div>
+        <div class="page-sub">Konfigurasi GitHub API</div>
+      </div>
+    </div>
+    <div class="content">
+      <div id="settings-alert"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">GitHub Access Token</span></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Personal Access Token (PAT)</label>
+              <input type="password" id="cfg-pat" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+            </div>
+            <div class="field">
+              <label>Username GitHub</label>
+              <input type="text" id="cfg-user" placeholder="cobrabagaskara" />
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">Simpan & Verifikasi</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Konfigurasi Repo</span></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Repo Private (source)</label>
+              <input type="text" id="cfg-private" placeholder="userscript-management-dashboard" />
+            </div>
+            <div class="field">
+              <label>Repo Public (deployed)</label>
+              <input type="text" id="cfg-public" placeholder="centralized-userscript-manager" />
+            </div>
+            <div class="field">
+              <label>Branch</label>
+              <input type="text" id="cfg-branch" value="main" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px;">
+        <div class="card-header"><span class="card-title">Info Konfigurasi Tersimpan</span></div>
+        <div class="card-body">
+          <div id="settings-info" style="font-family:var(--mono);font-size:12px;color:var(--text2);">
+            Belum ada konfigurasi tersimpan.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULES PAGE -->
+  <div id="page-modules" class="hidden">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Modul Manager</div>
+        <div class="page-sub">Kelola file modul di repo private</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="loadModules()">🔄 Refresh</button>
+        <button class="btn btn-primary" onclick="openModuleModal()">+ Modul Baru</button>
+      </div>
+    </div>
+    <div class="content">
+      <div id="modules-alert"></div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nama File</th>
+                <th>Ukuran</th>
+                <th>Terakhir Diubah</th>
+                <th style="text-align:right;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="modules-tbody">
+              <tr><td colspan="4" style="text-align:center;color:var(--text3);padding:32px;">Klik Refresh untuk memuat modul</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANIFEST PAGE -->
+  <div id="page-manifest" class="hidden">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Manifest Manager</div>
+        <div class="page-sub">Edit global-manifest.json di repo private</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="loadManifest()">🔄 Muat dari GitHub</button>
+        <button class="btn btn-primary" onclick="saveManifest()">💾 Simpan ke GitHub</button>
+      </div>
+    </div>
+    <div class="content">
+      <div id="manifest-alert"></div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchManifestTab('visual')" id="mtab-visual">Visual Editor</div>
+        <div class="tab" onclick="switchManifestTab('raw')" id="mtab-raw">Raw JSON</div>
+      </div>
+
+      <!-- Visual Editor -->
+      <div id="manifest-visual">
+        <div class="section">
+          <div class="section-title">Info Manifest</div>
+          <div class="grid-2">
+            <div class="field">
+              <label>Nama Manifest</label>
+              <input type="text" id="mf-name" placeholder="Jamu Loader — Production" />
+            </div>
+            <div class="field">
+              <label>Versi</label>
+              <input type="text" id="mf-version" placeholder="1.0.0" />
+            </div>
+            <div class="field">
+              <label>Min Extension Version</label>
+              <input type="text" id="mf-minver" placeholder="1.0.0" />
+            </div>
+            <div class="field">
+              <label>Author</label>
+              <input type="text" id="mf-author" placeholder="Aang" />
+            </div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="section">
+          <div class="section-title">Tracking</div>
+          <div class="grid-2">
+            <div class="field">
+              <label>Endpoint GAS</label>
+              <input type="text" id="mf-track-endpoint" placeholder="https://script.google.com/macros/s/..." />
+            </div>
+            <div class="field">
+              <label>Key</label>
+              <input type="text" id="mf-track-key" placeholder="JamuLoader2025" />
+            </div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="section">
+          <div class="section-title">Whitelist</div>
+          <div class="grid-2">
+            <div class="field">
+              <label>URL whitelist.json</label>
+              <input type="text" id="mf-wl-url" placeholder="https://raw.githubusercontent.com/..." />
+            </div>
+            <div class="field">
+              <label>Selector</label>
+              <input type="text" id="mf-wl-selector" placeholder="#menu_user .label-default" />
+            </div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="section">
+          <div class="section-title">Daftar Modul</div>
+          <div id="manifest-modules-list"></div>
+          <button class="btn btn-ghost" onclick="addManifestModule()" style="margin-top:12px;">+ Tambah Modul</button>
+        </div>
+      </div>
+
+      <!-- Raw JSON -->
+      <div id="manifest-raw" class="hidden">
+        <textarea id="mf-raw-json" style="min-height:500px;font-size:12px;" placeholder='{"name":"...","modules":[]}'></textarea>
+        <div style="margin-top:10px;display:flex;gap:10px;">
+          <button class="btn btn-ghost" onclick="syncRawToVisual()">← Sync ke Visual</button>
+          <button class="btn btn-ghost" onclick="syncVisualToRaw()">→ Sync ke Raw</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHITELIST PAGE -->
+  <div id="page-whitelist" class="hidden">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Whitelist Manager</div>
+        <div class="page-sub">Kelola whitelist.json di repo public</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="loadWhitelist()">🔄 Refresh</button>
+        <button class="btn btn-primary" onclick="saveWhitelist()">💾 Simpan ke GitHub</button>
+      </div>
+    </div>
+    <div class="content">
+      <div id="whitelist-alert"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Kode Puskesmas Aktif</span>
+            <span id="wl-count" class="badge badge-teal">0 entri</span>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Kode Puskesmas</th>
+                  <th style="text-align:right;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="whitelist-tbody">
+                <tr><td colspan="2" style="text-align:center;color:var(--text3);padding:24px;">Klik Refresh untuk memuat</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Tambah Kode</span></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Kode Puskesmas</label>
+              <input type="text" id="wl-new-code" placeholder="00001030825" />
+            </div>
+            <button class="btn btn-primary" onclick="addWhitelistCode()">+ Tambah</button>
+            <div class="sep"></div>
+            <div class="section-title" style="margin-bottom:10px;">Import Massal</div>
+            <div class="field">
+              <label>Satu kode per baris</label>
+              <textarea id="wl-bulk" placeholder="00001030825&#10;00001030826&#10;00001030827" style="min-height:120px;"></textarea>
+            </div>
+            <button class="btn btn-ghost" onclick="bulkImportWhitelist()">Import</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVERTER PAGE -->
+  <div id="page-converter" class="hidden">
+    <div class="topbar">
+      <div>
+        <div class="page-title">Converter</div>
+        <div class="page-sub">Tampermonkey → Jamu Loader module</div>
+      </div>
+      <button class="btn btn-primary" onclick="runConverter()">▶ Konversi</button>
+    </div>
+    <div class="content">
+      <div class="grid-2" style="gap:24px;">
+        <!-- Input -->
+        <div>
+          <div class="section-title">Input</div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header"><span class="card-title">Upload atau Paste Script</span></div>
+            <div class="card-body">
+              <div class="field">
+                <label>Upload .user.js</label>
+                <input type="file" id="cv-file" accept=".js,.user.js" onchange="loadFile(this)" style="color:var(--text2);" />
+              </div>
+              <div class="field">
+                <label>Atau paste kode</label>
+                <textarea id="cv-source" placeholder="// ==UserScript==&#10;// @name  Nama Script&#10;// ..." style="min-height:200px;font-size:11px;"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Metadata Modul</span></div>
+            <div class="card-body">
+              <div class="grid-2">
+                <div class="field">
+                  <label>Module ID</label>
+                  <input type="text" id="cv-id" placeholder="nama-modul" />
+                </div>
+                <div class="field">
+                  <label>Nama</label>
+                  <input type="text" id="cv-name" placeholder="Nama Modul" />
+                </div>
+                <div class="field">
+                  <label>Versi</label>
+                  <input type="text" id="cv-version" placeholder="1.0.0" />
+                </div>
+                <div class="field">
+                  <label>Icon</label>
+                  <div style="position:relative;">
+                    <div id="cv-emoji-display" onclick="toggleCvEmoji()" style="
+                      display:flex;align-items:center;gap:8px;
+                      background:var(--bg3);border:1px solid var(--border2);
+                      border-radius:8px;padding:8px 12px;cursor:pointer;">
+                      <span id="cv-emoji-selected" style="font-size:18px;">🧩</span>
+                      <span style="font-size:11px;color:var(--text2);font-family:var(--mono);">Pilih icon</span>
+                      <span style="margin-left:auto;color:var(--text3);">▾</span>
+                    </div>
+                    <input type="hidden" id="cv-icon" value="🧩" />
+                    <div id="cv-emoji-picker" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px;width:280px;">
+                      <input type="text" id="cv-emoji-search" placeholder="Cari..." oninput="filterCvEmoji(this.value)" style="margin-bottom:8px;" />
+                      <div id="cv-emoji-grid" class="emoji-grid"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Script URL di GitHub (repo public)</label>
+                <input type="text" id="cv-scripturl" value="https://raw.githubusercontent.com/cobrabagaskara/centralized-userscript-manager/main/modules/" />
+              </div>
+              <div class="field">
+                <label>User Selector <span style="color:var(--text3);">(opsional)</span></label>
+                <input type="text" id="cv-userselector" value="#menu_user .label-default" />
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <label style="font-size:12px;color:var(--text2);font-family:var(--mono);">Default Enabled</label>
+                <label class="toggle">
+                  <input type="checkbox" id="cv-defaultenabled" checked />
+                  <div class="toggle-track"></div>
+                  <div class="toggle-thumb"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Output -->
+        <div>
+          <div class="section-title">Output</div>
+          <div class="card">
+            <div class="card-header">
+              <div class="output-tabs" style="border:none;margin:0;">
+                <div class="output-tab active" onclick="switchCvTab('script')" id="cvtab-script">script.js</div>
+                <div class="output-tab" onclick="switchCvTab('manifest')" id="cvtab-manifest">manifest entry</div>
+                <div class="output-tab" onclick="switchCvTab('warnings')" id="cvtab-warnings">peringatan</div>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-ghost btn-sm" onclick="copyOutput()">📋 Copy</button>
+                <button class="btn btn-ghost btn-sm" onclick="downloadOutput()">⬇ Download</button>
+                <button class="btn btn-primary btn-sm" onclick="deployToGithub()">🚀 Deploy</button>
+              </div>
+            </div>
+            <div class="card-body" style="padding:0;">
+              <div id="cvpane-script" class="output-pane active">
+                <textarea id="cv-out-script" style="min-height:500px;font-size:11px;border:none;border-radius:0;background:var(--bg);" readonly placeholder="Hasil konversi script.js akan muncul di sini..."></textarea>
+              </div>
+              <div id="cvpane-manifest" class="output-pane">
+                <textarea id="cv-out-manifest" style="min-height:500px;font-size:11px;border:none;border-radius:0;background:var(--bg);" readonly placeholder="Manifest entry akan muncul di sini..."></textarea>
+              </div>
+              <div id="cvpane-warnings" class="output-pane">
+                <div id="cv-warnings-list" style="padding:16px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Module Modal -->
+<div class="modal-overlay" id="module-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="module-modal-title">Modul Baru</div>
+      <button class="modal-close" onclick="closeModuleModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="module-modal-alert"></div>
+      <div class="field">
+        <label>Nama File</label>
+        <input type="text" id="mod-filename" placeholder="nama-modul.js" />
+      </div>
+      <div class="field">
+        <label>Kode JavaScript</label>
+        <textarea id="mod-content" style="min-height:300px;font-size:11px;" placeholder="(function(__meta__){'use strict';&#10;  // kode modul di sini&#10;})(__meta__);"></textarea>
+      </div>
+      <div id="mod-commit-sha" style="display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModuleModal()">Batal</button>
+      <button class="btn btn-primary" id="mod-save-btn" onclick="saveModule()">💾 Simpan ke GitHub</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────
+let cfg = {};
+let whitelistData = [];
+let manifestData = {};
+let currentPage = 'settings';
+let modEditSha = null;
+let modEditFile = null;
+
+const EMOJIS = [
+  {e:'🧩',k:'puzzle module'},{e:'🔧',k:'tools wrench fix'},{e:'⚙️',k:'settings gear'},
+  {e:'🛠️',k:'tools build'},{e:'🔌',k:'plugin connect'},{e:'💉',k:'inject script'},
+  {e:'🚀',k:'launch fast'},{e:'⚡',k:'fast bolt'},{e:'🎯',k:'target aim'},
+  {e:'🔍',k:'search find'},{e:'🌐',k:'web internet'},{e:'📋',k:'clipboard copy'},
+  {e:'📝',k:'edit write note'},{e:'✏️',k:'edit pencil'},{e:'📌',k:'pin location'},
+  {e:'🗂️',k:'folder organize'},{e:'💾',k:'save disk'},{e:'🖥️',k:'screen desktop'},
+  {e:'🔒',k:'lock security'},{e:'🛡️',k:'shield protect'},{e:'🔑',k:'key access'},
+  {e:'👁️',k:'eye view watch'},{e:'🧠',k:'brain smart'},{e:'🤖',k:'robot auto'},
+  {e:'🧪',k:'test lab experiment'},{e:'📊',k:'chart data stats'},
+  {e:'📈',k:'chart up growth'},{e:'🗃️',k:'database storage'},
+  {e:'🏥',k:'hospital medical'},{e:'💊',k:'pill medicine'},{e:'🩺',k:'doctor stethoscope'},
+  {e:'📅',k:'calendar date'},{e:'⏰',k:'clock time alarm'},
+  {e:'🔔',k:'bell notification'},{e:'💬',k:'chat message'},
+  {e:'📧',k:'email mail'},{e:'✨',k:'sparkle magic'},{e:'⭐',k:'star favorite'},
+  {e:'💡',k:'idea light bulb'},{e:'🔥',k:'fire hot'},{e:'🎁',k:'gift package'},
+  {e:'🚦',k:'traffic signal status'},{e:'🔴',k:'red stop'},{e:'🟢',k:'green go active'},
+  {e:'🟡',k:'yellow warn'},{e:'✅',k:'check done ok'},{e:'❌',k:'cross error fail'},
+  {e:'⚠️',k:'warning alert'},{e:'ℹ️',k:'info help'},
+];
+
+// ── Init ──────────────────────────────────────────────────────
+(function init() {
+  const saved = localStorage.getItem('jamu-cms-cfg');
+  if (saved) {
+    cfg = JSON.parse(saved);
+    fillSettingsForm();
+    updatePatStatus(true);
+  }
+  renderEmojiGrid('cv-emoji-grid', EMOJIS, selectCvEmoji);
+})();
+
+// ── Navigation ────────────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + page).classList.remove('hidden');
+  document.getElementById('nav-' + page).classList.add('active');
+  currentPage = page;
+  if (page === 'modules' && cfg.pat) loadModules();
+  if (page === 'whitelist' && cfg.pat) loadWhitelist();
+  if (page === 'manifest' && cfg.pat) loadManifest();
+}
+
+// ── Settings ──────────────────────────────────────────────────
+function fillSettingsForm() {
+  if (cfg.pat) document.getElementById('cfg-pat').value = cfg.pat;
+  if (cfg.user) document.getElementById('cfg-user').value = cfg.user;
+  if (cfg.private) document.getElementById('cfg-private').value = cfg.private;
+  if (cfg.public) document.getElementById('cfg-public').value = cfg.public;
+  if (cfg.branch) document.getElementById('cfg-branch').value = cfg.branch;
+  const info = document.getElementById('settings-info');
+  info.innerHTML = `User: <b style="color:var(--accent)">${cfg.user||'-'}</b> &nbsp;|&nbsp; Private: <b style="color:var(--accent)">${cfg.private||'-'}</b> &nbsp;|&nbsp; Public: <b style="color:var(--accent)">${cfg.public||'-'}</b> &nbsp;|&nbsp; Branch: <b style="color:var(--accent)">${cfg.branch||'main'}</b>`;
+}
+
+async function saveSettings() {
+  cfg = {
+    pat: document.getElementById('cfg-pat').value.trim(),
+    user: document.getElementById('cfg-user').value.trim(),
+    private: document.getElementById('cfg-private').value.trim(),
+    public: document.getElementById('cfg-public').value.trim(),
+    branch: document.getElementById('cfg-branch').value.trim() || 'main',
+  };
+  if (!cfg.pat || !cfg.user) { showAlert('settings-alert','error','PAT dan username wajib diisi.'); return; }
+  const btn = event.target;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Verifikasi...';
+  try {
+    const res = await ghGet(`https://api.github.com/user`);
+    if (res.login) {
+      localStorage.setItem('jamu-cms-cfg', JSON.stringify(cfg));
+      fillSettingsForm();
+      updatePatStatus(true);
+      showAlert('settings-alert','success',`✓ Berhasil terhubung sebagai @${res.login}`);
+      toast('Pengaturan tersimpan', 'success');
+    }
+  } catch(e) {
+    showAlert('settings-alert','error','Gagal verifikasi: ' + e.message);
+    updatePatStatus(false);
+  }
+  btn.disabled = false; btn.innerHTML = 'Simpan & Verifikasi';
+}
+
+function updatePatStatus(ok) {
+  document.getElementById('pat-dot').className = 'pat-dot' + (ok ? ' ok' : '');
+  document.getElementById('pat-status-text').textContent = ok ? cfg.user || 'Terhubung' : 'PAT belum dikonfigurasi';
+}
+
+// ── GitHub API ────────────────────────────────────────────────
+async function ghGet(url) {
+  const r = await fetch(url, { headers: { 'Authorization': `Bearer ${cfg.pat}`, 'Accept': 'application/vnd.github+json' }});
+  if (!r.ok) throw new Error(`GitHub API ${r.status}: ${r.statusText}`);
+  return r.json();
+}
+
+async function ghPut(url, body) {
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${cfg.pat}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const t = await r.text(); throw new Error(`GitHub API ${r.status}: ${t}`); }
+  return r.json();
+}
+
+function ghApiUrl(repo, path) {
+  return `https://api.github.com/repos/${cfg.user}/${repo}/contents/${path}?ref=${cfg.branch}`;
+}
+
+async function getFileSha(repo, path) {
+  try {
+    const f = await ghGet(ghApiUrl(repo, path));
+    // Decode base64 dengan TextDecoder agar emoji/unicode tidak rusak
+    const b64 = f.content.replace(/\n/g, '');
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const decoded = new TextDecoder('utf-8').decode(bytes);
+    return { sha: f.sha, content: decoded };
+  }
+  catch { return { sha: null, content: '' }; }
+}
+
+// ── Modules ───────────────────────────────────────────────────
+async function loadModules() {
+  if (!checkCfg()) return;
+  const tbody = document.getElementById('modules-tbody');
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>';
+  try {
+    const files = await ghGet(`https://api.github.com/repos/${cfg.user}/${cfg.private}/contents/modules?ref=${cfg.branch}`);
+    if (!files.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px;">Folder modules kosong</td></tr>'; return; }
+    tbody.innerHTML = files.map(f => `
+      <tr>
+        <td><span style="font-family:var(--mono);font-size:12px;color:var(--accent);">${f.name}</span></td>
+        <td><span style="font-family:var(--mono);font-size:11px;color:var(--text2);">${(f.size/1024).toFixed(1)} KB</span></td>
+        <td><span style="font-size:12px;color:var(--text3);">${f.sha.slice(0,7)}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="btn btn-ghost btn-sm" onclick="editModule('${f.name}','${f.sha}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteModule('${f.name}','${f.sha}')">Hapus</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch(e) { showAlert('modules-alert','error','Gagal memuat modul: ' + e.message); }
+}
+
+function openModuleModal(filename='', content='', sha=null) {
+  modEditSha = sha;
+  modEditFile = filename;
+  document.getElementById('module-modal-title').textContent = sha ? 'Edit Modul' : 'Modul Baru';
+  document.getElementById('mod-filename').value = filename;
+  document.getElementById('mod-filename').disabled = !!sha;
+  document.getElementById('mod-content').value = content;
+  document.getElementById('module-modal-alert').innerHTML = '';
+  document.getElementById('module-modal').classList.add('open');
+}
+
+function closeModuleModal() { document.getElementById('module-modal').classList.remove('open'); }
+
+async function editModule(filename, sha) {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const { content } = await getFileSha(cfg.private, `modules/${filename}`);
+    openModuleModal(filename, content, sha);
+  } catch(e) { toast('Gagal memuat: ' + e.message, 'error'); }
+  btn.disabled = false; btn.textContent = 'Edit';
+}
+
+async function saveModule() {
+  const filename = document.getElementById('mod-filename').value.trim();
+  const content = document.getElementById('mod-content').value;
+  if (!filename || !content) { showAlert('module-modal-alert','error','Nama file dan kode wajib diisi.'); return; }
+  const btn = document.getElementById('mod-save-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
+  try {
+    const path = `modules/${filename.endsWith('.js') ? filename : filename + '.js'}`;
+    const { sha } = await getFileSha(cfg.private, path);
+    const body = {
+      message: sha ? `Update: ${filename}` : `Add: ${filename}`,
+      content: toBase64(content),
+      branch: cfg.branch
+    };
+    if (sha) body.sha = sha;
+    await ghPut(`https://api.github.com/repos/${cfg.user}/${cfg.private}/contents/${path}`, body);
+    closeModuleModal();
+    toast(`${filename} berhasil disimpan ke GitHub`, 'success');
+    loadModules();
+    updateModulesReadme();
+  } catch(e) { showAlert('module-modal-alert','error','Gagal simpan: ' + e.message); }
+  btn.disabled = false; btn.innerHTML = '💾 Simpan ke GitHub';
+}
+
+async function deleteModule(filename, sha) {
+  if (!confirm(`Hapus ${filename}?`)) return;
+  try {
+    await ghPut(`https://api.github.com/repos/${cfg.user}/${cfg.private}/contents/modules/${filename}`, {
+      message: `Delete: ${filename}`, sha, branch: cfg.branch,
+      _method: undefined
+    });
+  } catch {}
+  const r = await fetch(`https://api.github.com/repos/${cfg.user}/${cfg.private}/contents/modules/${filename}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${cfg.pat}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: `Delete: ${filename}`, sha, branch: cfg.branch })
+  });
+  if (r.ok) { toast(`${filename} dihapus`, 'success'); loadModules(); updateModulesReadme(); }
+  else toast('Gagal hapus', 'error');
+}
+
+// ── Manifest ──────────────────────────────────────────────────
+async function loadManifest() {
+  if (!checkCfg()) return;
+  showAlert('manifest-alert','info','Memuat manifest...');
+  try {
+    const { content } = await getFileSha(cfg.private, 'global-manifest.json');
+    manifestData = JSON.parse(content);
+    fillManifestVisual(manifestData);
+    document.getElementById('mf-raw-json').value = JSON.stringify(manifestData, null, 2);
+    showAlert('manifest-alert','success','Manifest berhasil dimuat dari GitHub.');
+    setTimeout(() => document.getElementById('manifest-alert').innerHTML = '', 2000);
+  } catch(e) { showAlert('manifest-alert','error','Gagal memuat manifest: ' + e.message); }
+}
+
+function fillManifestVisual(m) {
+  document.getElementById('mf-name').value = m.name || '';
+  document.getElementById('mf-version').value = m.version || '';
+  document.getElementById('mf-minver').value = m.minExtensionVersion || '';
+  document.getElementById('mf-author').value = m.author || '';
+  document.getElementById('mf-track-endpoint').value = m.tracking?.endpoint || '';
+  document.getElementById('mf-track-key').value = m.tracking?.key || '';
+  document.getElementById('mf-wl-url').value = m.whitelist?.url || '';
+  document.getElementById('mf-wl-selector').value = m.whitelist?.selector || '';
+  renderManifestModules(m.modules || []);
+}
+
+function renderManifestModules(modules) {
+  const el = document.getElementById('manifest-modules-list');
+  if (!modules.length) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">Belum ada modul.</div>'; return; }
+  el.innerHTML = modules.map((m, i) => `
+    <div class="card mod-card" draggable="true" data-index="${i}"
+      style="margin-bottom:8px;cursor:grab;transition:opacity 0.15s;"
+      ondragstart="onModDragStart(event,${i})"
+      ondragover="onModDragOver(event)"
+      ondrop="onModDrop(event,${i})"
+      ondragend="onModDragEnd(event)">
+      <div class="card-body" style="padding:12px 16px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:var(--text3);font-size:14px;cursor:grab;user-select:none;">⠿</span>
+          <span style="font-size:15px;">${m.icon||'🧩'}</span>
+          <div style="flex:1;">
+            <span style="font-weight:600;font-size:13px;">${m.name||''}</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:8px;">${m.id||''}</span>
+          </div>
+          <span class="badge badge-gray">${m.version||''}</span>
+          <span class="badge ${m.defaultEnabled===false ? 'badge-red' : 'badge-green'}" style="margin-left:6px;">${m.defaultEnabled===false ? 'OFF' : 'ON'}</span>
+          <button class="btn btn-danger btn-sm" style="margin-left:8px;" onclick="removeManifestModule(${i})">✕</button>
+        </div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:6px;padding-left:52px;">${(m.matches||[]).join(', ')}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Drag & Drop reorder ───────────────────────────────────────
+let dragSrcIndex = null;
+
+function onModDragStart(e, i) {
+  dragSrcIndex = i;
+  e.currentTarget.style.opacity = '0.4';
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function onModDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.style.borderColor = 'var(--accent)';
+}
+
+function onModDrop(e, targetIndex) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = '';
+  if (dragSrcIndex === null || dragSrcIndex === targetIndex) return;
+  const mods = manifestData.modules;
+  const moved = mods.splice(dragSrcIndex, 1)[0];
+  mods.splice(targetIndex, 0, moved);
+  manifestData.modules = mods;
+  renderManifestModules(mods);
+  syncVisualToRaw();
+  toast('Urutan diperbarui — jangan lupa Simpan', 'info');
+}
+
+function onModDragEnd(e) {
+  dragSrcIndex = null;
+  document.querySelectorAll('.mod-card').forEach(el => {
+    el.style.opacity = '';
+    el.style.borderColor = '';
+  });
+}
+
+function addManifestModule() {
+  const modules = getManifestFromVisual().modules;
+  modules.push({ id:'modul-baru', name:'Modul Baru', version:'1.0.0', icon:'🧩', defaultEnabled:true, scriptUrl:'', matches:['https://*/*'] });
+  manifestData.modules = modules;
+  renderManifestModules(modules);
+  toast('Modul baru ditambahkan — edit di Raw JSON untuk mengisi detail', 'info');
+  switchManifestTab('raw');
+  syncVisualToRaw();
+}
+
+function removeManifestModule(i) {
+  const m = getManifestFromVisual();
+  m.modules.splice(i, 1);
+  manifestData = m;
+  renderManifestModules(m.modules);
+}
+
+function getManifestFromVisual() {
+  return {
+    name: document.getElementById('mf-name').value,
+    version: document.getElementById('mf-version').value,
+    author: document.getElementById('mf-author').value,
+    description: manifestData.description || '',
+    minExtensionVersion: document.getElementById('mf-minver').value,
+    tracking: { endpoint: document.getElementById('mf-track-endpoint').value, key: document.getElementById('mf-track-key').value },
+    whitelist: { url: document.getElementById('mf-wl-url').value, selector: document.getElementById('mf-wl-selector').value },
+    modules: manifestData.modules || []
+  };
+}
+
+function syncVisualToRaw() {
+  manifestData = getManifestFromVisual();
+  document.getElementById('mf-raw-json').value = JSON.stringify(manifestData, null, 2);
+}
+
+function syncRawToVisual() {
+  try {
+    manifestData = JSON.parse(document.getElementById('mf-raw-json').value);
+    fillManifestVisual(manifestData);
+    toast('Sync berhasil', 'success');
+  } catch(e) { toast('JSON tidak valid: ' + e.message, 'error'); }
+}
+
+async function saveManifest() {
+  if (!checkCfg()) return;
+  // Gunakan Raw JSON langsung sebagai sumber — jangan timpa dengan visual
+  // Jika tab visual aktif, sync visual → raw dulu
+  const rawTab = document.getElementById('mtab-raw').classList.contains('active');
+  if (!rawTab) syncVisualToRaw();
+  const content = document.getElementById('mf-raw-json').value;
+  try { JSON.parse(content); } catch(e) { showAlert('manifest-alert','error','JSON tidak valid: ' + e.message); return; }
+  showAlert('manifest-alert','info','Menyimpan...');
+  try {
+    const { sha } = await getFileSha(cfg.private, 'global-manifest.json');
+    const body = { message: 'Update: global-manifest.json', content: toBase64(content), branch: cfg.branch };
+    if (sha) body.sha = sha;
+    await ghPut(`https://api.github.com/repos/${cfg.user}/${cfg.private}/contents/global-manifest.json`, body);
+    showAlert('manifest-alert','success','✓ Manifest berhasil disimpan. Workflow deploy akan berjalan otomatis.');
+    toast('Manifest disimpan ke GitHub', 'success');
+    // Pass manifest yang baru disimpan langsung — hindari race condition dengan GitHub propagation
+    updateModulesReadme(JSON.parse(content));
+  } catch(e) { showAlert('manifest-alert','error','Gagal simpan: ' + e.message); }
+}
+
+function switchManifestTab(tab) {
+  document.getElementById('manifest-visual').classList.toggle('hidden', tab !== 'visual');
+  document.getElementById('manifest-raw').classList.toggle('hidden', tab !== 'raw');
+  document.getElementById('mtab-visual').classList.toggle('active', tab === 'visual');
+  document.getElementById('mtab-raw').classList.toggle('active', tab === 'raw');
+}
+
+// ── Whitelist ─────────────────────────────────────────────────
+async function loadWhitelist() {
+  if (!checkCfg()) return;
+  const tbody = document.getElementById('whitelist-tbody');
+  tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:24px;"><span class="spinner"></span></td></tr>';
+  try {
+    const { content } = await getFileSha(cfg.public, 'whitelist.json');
+    whitelistData = content ? JSON.parse(content) : [];
+    renderWhitelist();
+  } catch(e) {
+    whitelistData = [];
+    renderWhitelist();
+    showAlert('whitelist-alert','info','whitelist.json belum ada di repo public — akan dibuat saat disimpan.');
+  }
+}
+
+function renderWhitelist() {
+  const tbody = document.getElementById('whitelist-tbody');
+  document.getElementById('wl-count').textContent = whitelistData.length + ' entri';
+  if (!whitelistData.length) {
+    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text3);padding:24px;">Whitelist kosong — semua puskesmas diblokir</td></tr>';
+    return;
+  }
+  tbody.innerHTML = whitelistData.map((code, i) => `
+    <tr>
+      <td><span style="font-family:var(--mono);font-size:13px;">${code}</span></td>
+      <td><div class="row-actions"><button class="btn btn-danger btn-sm" onclick="removeWhitelistCode(${i})">Hapus</button></div></td>
+    </tr>`).join('');
+}
+
+function addWhitelistCode() {
+  const code = document.getElementById('wl-new-code').value.trim();
+  if (!code) return;
+  if (whitelistData.includes(code)) { toast('Kode sudah ada', 'error'); return; }
+  whitelistData.push(code);
+  renderWhitelist();
+  document.getElementById('wl-new-code').value = '';
+  toast(`${code} ditambahkan — jangan lupa Simpan`, 'info');
+}
+
+function removeWhitelistCode(i) {
+  const code = whitelistData[i];
+  whitelistData.splice(i, 1);
+  renderWhitelist();
+  toast(`${code} dihapus — jangan lupa Simpan`, 'info');
+}
+
+function bulkImportWhitelist() {
+  const lines = document.getElementById('wl-bulk').value.trim().split('\n').map(l => l.trim()).filter(Boolean);
+  let added = 0;
+  lines.forEach(code => { if (!whitelistData.includes(code)) { whitelistData.push(code); added++; } });
+  renderWhitelist();
+  document.getElementById('wl-bulk').value = '';
+  toast(`${added} kode ditambahkan — jangan lupa Simpan`, 'success');
+}
+
+async function saveWhitelist() {
+  if (!checkCfg()) return;
+  const content = JSON.stringify(whitelistData, null, 2);
+  showAlert('whitelist-alert','info','Menyimpan ke repo public...');
+  try {
+    const { sha } = await getFileSha(cfg.public, 'whitelist.json');
+    const body = { message: 'Update: whitelist.json', content: toBase64(content), branch: cfg.branch };
+    if (sha) body.sha = sha;
+    await ghPut(`https://api.github.com/repos/${cfg.user}/${cfg.public}/contents/whitelist.json`, body);
+    showAlert('whitelist-alert','success','✓ Whitelist berhasil disimpan ke repo public. Langsung aktif.');
+    toast('Whitelist disimpan ke GitHub', 'success');
+  } catch(e) { showAlert('whitelist-alert','error','Gagal: ' + e.message); }
+}
+
+// ── Converter ─────────────────────────────────────────────────
+function loadFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    document.getElementById('cv-source').value = src;
+    autoFillMeta(src);
+  };
+  reader.readAsText(file);
+}
+
+function autoFillMeta(src) {
+  const get = key => { const m = src.match(new RegExp(`@${key}\\s+(.+)`)); return m ? m[1].trim() : ''; };
+  const name = get('name');
+  const ver = get('version') || '1.0.0';
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  if (name) document.getElementById('cv-name').value = name;
+  if (id) document.getElementById('cv-id').value = id;
+  document.getElementById('cv-version').value = ver;
+  const matches = [];
+  const re = /@match\s+(.+)/g; let m;
+  while ((m = re.exec(src)) !== null) matches.push(m[1].trim());
+  autoFillMatches = matches;
+}
+
+let autoFillMatches = [];
+
+function runConverter() {
+  const src = document.getElementById('cv-source').value.trim();
+  if (!src) { toast('Paste kode dulu', 'error'); return; }
+  const id = document.getElementById('cv-id').value.trim() || 'modul-baru';
+  const name = document.getElementById('cv-name').value.trim() || 'Modul Baru';
+  const version = document.getElementById('cv-version').value.trim() || '1.0.0';
+  const icon = document.getElementById('cv-icon').value || '🧩';
+  const defaultEnabled = document.getElementById('cv-defaultenabled').checked;
+  const userSelector = document.getElementById('cv-userselector').value.trim();
+  let scriptUrlBase = document.getElementById('cv-scripturl').value.trim();
+  if (scriptUrlBase.endsWith('/')) scriptUrlBase += `${id}.js`;
+  const warnings = [];
+  let code = src;
+
+  // Strip UserScript header
+  code = code.replace(/\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==/,'').trim();
+
+  // Strip IIFE wrapper
+  const iifeMatch = code.match(/^\s*\(function\s*\([^)]*\)\s*\{([\s\S]*)\}\s*\)\s*\(\s*\)\s*;?\s*$/);
+  if (iifeMatch) { code = iifeMatch[1].trim(); warnings.push({level:'info',msg:'IIFE wrapper dihapus dan diganti wrapper Jamu Loader'}); }
+
+  // GM conversions
+  if (/GM_addStyle/.test(code)) {
+    code = code.replace(/GM_addStyle\s*\(([^)]+)\)/g, `(function(css){const s=document.createElement('style');s.textContent=css;document.head.appendChild(s);}($1))`);
+    warnings.push({level:'info',msg:'GM_addStyle → inject <style> tag'});
+  }
+  if (/GM_setValue|GM_getValue/.test(code)) {
+    code = code.replace(/GM_setValue\s*\(([^,]+),([^)]+)\)/g,'localStorage.setItem($1,$2)');
+    code = code.replace(/GM_getValue\s*\(([^,)]+)[^)]*\)/g,'localStorage.getItem($1)');
+    warnings.push({level:'warn',msg:'GM_setValue/getValue → localStorage (data hilang jika clear cache)'});
+  }
+  if (/GM_log/.test(code)) { code = code.replace(/GM_log/g,'console.log'); warnings.push({level:'info',msg:'GM_log → console.log'}); }
+  if (/GM_xmlhttpRequest/.test(code)) warnings.push({level:'error',msg:'GM_xmlhttpRequest perlu dikonversi manual → fetch() API'});
+  if (/unsafeWindow/.test(code)) warnings.push({level:'warn',msg:'unsafeWindow — sudah menggunakan window biasa di MAIN world, hapus prefix unsafeWindow'});
+
+  // Final wrap
+  const meta = { id, version, name };
+  const finalCode = `(function(__meta__){\n  "use strict";\n${code}\n})(__meta__);`;
+  document.getElementById('cv-out-script').value = finalCode;
+
+  // Manifest entry
+  const matches = autoFillMatches.length ? autoFillMatches : ['https://*/*'];
+  const entry = { id, name, version, icon, defaultEnabled, scriptUrl: scriptUrlBase, matches };
+  if (userSelector) entry.userSelector = userSelector;
+  document.getElementById('cv-out-manifest').value = JSON.stringify(entry, null, 2);
+
+  // Warnings
+  const wEl = document.getElementById('cv-warnings-list');
+  if (!warnings.length) {
+    wEl.innerHTML = '<div style="color:var(--success);font-family:var(--mono);font-size:12px;padding:12px;">✓ Tidak ada peringatan</div>';
+  } else {
+    wEl.innerHTML = warnings.map(w => `<div class="warn-item warn-${w.level}">${w.msg}</div>`).join('');
+  }
+
+  const hasError = warnings.some(w => w.level === 'error');
+  if (hasError) switchCvTab('warnings');
+  else switchCvTab('script');
+  toast('Konversi selesai', 'success');
+  cvCurrentFile = id + '.js';
+}
+
+let cvCurrentFile = 'module.js';
+
+function switchCvTab(tab) {
+  ['script','manifest','warnings'].forEach(t => {
+    document.getElementById('cvpane-' + t).classList.toggle('active', t === tab);
+    document.getElementById('cvtab-' + t).classList.toggle('active', t === tab);
+  });
+}
+
+function copyOutput() {
+  const active = document.querySelector('.output-pane.active textarea');
+  if (!active) return;
+  navigator.clipboard.writeText(active.value);
+  toast('Disalin ke clipboard', 'success');
+}
+
+function downloadOutput() {
+  const isScript = document.getElementById('cvpane-script').classList.contains('active');
+  const content = isScript ? document.getElementById('cv-out-script').value : document.getElementById('cv-out-manifest').value;
+  const filename = isScript ? cvCurrentFile : 'manifest-entry.json';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], {type:'text/plain'}));
+  a.download = filename;
+  a.click();
+}
+
+async function deployToGithub() {
+  if (!checkCfg()) { toast('Konfigurasi PAT dulu di Pengaturan', 'error'); return; }
+  const script = document.getElementById('cv-out-script').value;
+  if (!script) { toast('Konversi dulu', 'error'); return; }
+  const id = document.getElementById('cv-id').value.trim() || 'modul-baru';
+  const filename = `${id}.js`;
+  const btn = event.target;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const path = `modules/${filename}`;
+    const { sha } = await getFileSha(cfg.private, path);
+    const body = { message: sha ? `Update: ${filename}` : `Add: ${filename}`, content: toBase64(script), branch: cfg.branch };
+    if (sha) body.sha = sha;
+    await ghPut(`https://api.github.com/repos/${cfg.user}/${cfg.private}/contents/${path}`, body);
+    toast(`✓ ${filename} berhasil deploy ke repo private. Workflow akan obfuscate otomatis.`, 'success');
+  } catch(e) { toast('Gagal deploy: ' + e.message, 'error'); }
+  btn.disabled = false; btn.innerHTML = '🚀 Deploy';
+}
+
+// ── Emoji ─────────────────────────────────────────────────────
+let cvEmojiOpen = false;
+
+function renderEmojiGrid(gridId, list, onSelect) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  grid.innerHTML = list.map(({e,k}) => `<button class="emoji-btn" title="${k}" onclick="(${onSelect.toString()})('${e}')">${e}</button>`).join('');
+}
+
+function toggleCvEmoji() {
+  cvEmojiOpen = !cvEmojiOpen;
+  document.getElementById('cv-emoji-picker').style.display = cvEmojiOpen ? 'block' : 'none';
+  if (cvEmojiOpen) renderEmojiGrid('cv-emoji-grid', EMOJIS, selectCvEmoji);
+}
+
+function selectCvEmoji(emoji) {
+  document.getElementById('cv-icon').value = emoji;
+  document.getElementById('cv-emoji-selected').textContent = emoji;
+  document.getElementById('cv-emoji-picker').style.display = 'none';
+  cvEmojiOpen = false;
+}
+
+function filterCvEmoji(q) {
+  const filtered = q.trim() ? EMOJIS.filter(({e,k}) => k.includes(q.toLowerCase()) || e.includes(q)) : EMOJIS;
+  renderEmojiGrid('cv-emoji-grid', filtered, selectCvEmoji);
+}
+
+document.addEventListener('click', e => {
+  if (cvEmojiOpen && !e.target.closest('#cv-emoji-picker') && !e.target.closest('#cv-emoji-display')) {
+    document.getElementById('cv-emoji-picker').style.display = 'none';
+    cvEmojiOpen = false;
+  }
+});
+
+
+// ── README Generator ─────────────────────────────────────────
+async function updateModulesReadme(manifestOverride) {
+  try {
+    // Ambil daftar file di modules/
+    const files = await ghGet(`https://api.github.com/repos/${cfg.user}/${cfg.private}/contents/modules?ref=${cfg.branch}`);
+    const fileNames = files.filter(f => f.name.endsWith('.js')).map(f => f.name.replace('.js',''));
+
+    // Gunakan manifest yang di-pass langsung jika ada (hindari race condition)
+    // Jika tidak ada, fetch dari GitHub (untuk kasus hapus modul / simpan file)
+    let mf;
+    if (manifestOverride) {
+      mf = manifestOverride;
+    } else {
+      const { content: mfContent } = await getFileSha(cfg.private, 'global-manifest.json');
+      mf = mfContent ? JSON.parse(mfContent) : { modules: [] };
+    }
+
+    // Filter: hanya modul yang ada di manifest DAN ada filenya
+    const rows = [];
+    (mf.modules || []).forEach(m => {
+      if (fileNames.includes(m.id)) {
+        const matches = (m.matches || []).map(p => {
+          try { return new URL(p.replace(/\*/g,'')).hostname.replace(/^\./,''); } catch { return p; }
+        }).filter((v,i,a) => a.indexOf(v) === i).join(', ');
+        rows.push({ name: m.name, version: m.version, matches });
+      }
+    });
+
+    // Build markdown
+    const lines = [
+      '# Daftar Modul',
+      '',
+      '| No | Nama | Versi | Matches |',
+      '|----|------|-------|---------|',
+      ...rows.map((r, i) => `| ${i+1} | ${r.name} | ${r.version} | ${r.matches} |`),
+      '',
+      `_Terakhir diperbarui: ${new Date().toLocaleString('id-ID')}_`
+    ];
+    const readme = lines.join('\n');
+
+    // Simpan ke modules/README.md
+    const { sha } = await getFileSha(cfg.private, 'modules/README.md');
+    const body = { message: 'Update: modules/README.md', content: toBase64(readme), branch: cfg.branch };
+    if (sha) body.sha = sha;
+    await ghPut(`https://api.github.com/repos/${cfg.user}/${cfg.private}/contents/modules/README.md`, body);
+    log && console.log('[JamuCMS] README updated');
+  } catch(e) {
+    console.warn('[JamuCMS] README update failed:', e.message);
+  }
+}
+// ── Utils ─────────────────────────────────────────────────────
+// btoa tidak support emoji/unicode — pakai TextEncoder
+function toBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+
+function checkCfg() {
+  if (!cfg.pat || !cfg.user) { toast('Konfigurasi PAT dulu di Pengaturan', 'error'); showPage('settings'); return false; }
+  return true;
+}
+
+function showAlert(elId, type, msg) {
+  document.getElementById(elId).innerHTML = `<div class="alert alert-${type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'}">${msg}</div>`;
+}
+
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+</script>
+</body>
+</html>
