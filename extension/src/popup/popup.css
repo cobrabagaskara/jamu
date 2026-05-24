@@ -1,0 +1,648 @@
+/* ============================================================
+   Jamu Loader Popup — Industrial/Terminal Aesthetic
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0d0f12;
+  --bg2: #131619;
+  --bg3: #1a1e23;
+  --border: #252a31;
+  --border-bright: #2e3640;
+  --text: #c8d0db;
+  --text-dim: #5a6472;
+  --text-bright: #e8edf3;
+  --accent: #00d4aa;
+  --accent-dim: rgba(0, 212, 170, 0.12);
+  --accent-glow: rgba(0, 212, 170, 0.3);
+  --warn: #f59e0b;
+  --warn-dim: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-dim: rgba(239, 68, 68, 0.12);
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+}
+
+html, body {
+  width: 340px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  max-height: 540px;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.logo-bracket { color: var(--text-dim); }
+.logo-text { color: var(--accent); }
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-bright);
+  letter-spacing: 0.5px;
+}
+
+/*
+ * Wrapper subtitle agar module-count dan custom-indicator
+ * bisa duduk sejajar dalam satu baris.
+ */
+.subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.subtitle {
+  font-size: 10px;
+  color: var(--text-bright);
+  font-family: var(--mono);
+}
+
+/*
+ * Indikator custom manifest — muncul di samping jumlah modul.
+ * Ukurannya sengaja kecil dan warnanya redup agar tidak mengganggu
+ * tampilan user biasa, tapi tetap terbaca oleh admin yang tahu.
+ */
+.custom-indicator {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--accent);
+  opacity: 0.7;
+  letter-spacing: 0.3px;
+}
+
+.header-right {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.icon-btn.spinning svg {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Version Blocked Banner ────────────────────────────── */
+
+.version-blocked-banner {
+  background: var(--danger-dim);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.version-blocked-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.version-blocked-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.version-blocked-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.version-blocked-text strong {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.version-blocked-text span {
+  font-size: 10px;
+  color: #f87171;
+  font-family: var(--mono);
+  line-height: 1.5;
+}
+
+/* ── Update Banner ─────────────────────────────────────── */
+
+.update-banner {
+  background: var(--warn-dim);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 7px 12px;
+  flex-shrink: 0;
+}
+
+.update-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.update-icon { font-size: 13px; }
+
+#update-banner-text {
+  flex: 1;
+  color: var(--warn);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.update-btn {
+  background: var(--warn);
+  color: #000;
+  border: none;
+  border-radius: 3px;
+  padding: 3px 9px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--mono);
+  letter-spacing: 0.3px;
+  transition: opacity 0.15s;
+}
+
+.update-btn:hover { opacity: 0.85; }
+
+.hidden { display: none !important; }
+
+/* ── Settings Panel ────────────────────────────────────── */
+
+.settings-panel {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.settings-content {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: var(--mono);
+}
+
+/*
+ * Baris info versi extension — label di kiri, badge versi di kanan.
+ * Badge dibaca dari chrome.runtime.getManifest().version di popup.js.
+ */
+.settings-version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-version-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(0, 212, 170, 0.3);
+  padding: 1px 7px;
+  border-radius: 3px;
+}
+
+/*
+ * Baris status manifest — label di kiri, badge status di kanan.
+ * Badge berubah warna sesuai kondisi: hijau (connected), merah (failed),
+ * abu (not set).
+ */
+.settings-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status-badge {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.connected {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(0, 212, 170, 0.3);
+}
+
+.status-badge.failed {
+  color: var(--danger);
+  background: var(--danger-dim);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-badge.not-set {
+  color: var(--text-dim);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+}
+
+/* Garis pemisah tipis antara info global dan custom manifest section */
+.settings-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2px 0;
+}
+
+/*
+ * Header custom manifest — label di kiri, toggle on/off di kanan.
+ * Toggle ini terpisah dari input URL sehingga admin bisa menyimpan URL
+ * tanpa harus menghapusnya saat ingin menonaktifkan sementara.
+ */
+.settings-custom-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.url-input {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+  padding: 5px 8px;
+  color: var(--text-bright);
+  font-family: var(--mono);
+  font-size: 10px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.url-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+.url-input::placeholder { color: var(--text-dim); }
+
+/* Input URL dinonaktifkan secara visual saat custom manifest toggle off */
+.url-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.save-btn {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--mono);
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.save-btn:hover { opacity: 0.85; }
+.save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.settings-meta {
+  font-size: 9.5px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+/* ── Module List ───────────────────────────────────────── */
+
+.module-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+  min-height: 60px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-bright) transparent;
+}
+
+.module-list::-webkit-scrollbar { width: 4px; }
+.module-list::-webkit-scrollbar-track { background: transparent; }
+.module-list::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+/* ── Module Card ───────────────────────────────────────── */
+
+.module-card {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+  cursor: default;
+}
+
+.module-card:last-child { border-bottom: none; }
+.module-card:hover { background: var(--bg2); }
+.module-card.has-update { background: rgba(245, 158, 11, 0.04); }
+
+.module-card.version-blocked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.module-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background: var(--bg3);
+  border: 1px solid var(--border-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.module-card.enabled .module-icon {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.module-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.module-name {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--text-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.module-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.module-version {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--text-bright);
+  background: var(--bg3);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.module-version.has-update {
+  color: var(--warn);
+  border-color: rgba(245, 158, 11, 0.4);
+  background: var(--warn-dim);
+}
+
+.module-matches {
+  font-size: 9.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.module-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.update-module-btn {
+  background: transparent;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 3px;
+  color: var(--warn);
+  font-size: 9px;
+  font-family: var(--mono);
+  font-weight: 600;
+  padding: 2px 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.update-module-btn:hover {
+  background: var(--warn-dim);
+  border-color: var(--warn);
+}
+
+/* ── Toggle Switch ─────────────────────────────────────── */
+
+.toggle {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/*
+ * toggle-small — varian lebih kecil untuk toggle custom manifest di settings.
+ * Ukurannya dikurangi agar proporsional dengan label settings yang kecil.
+ */
+.toggle-small {
+  width: 26px;
+  height: 15px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--border-bright);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.toggle-small .toggle-track::after {
+  width: 9px;
+  height: 9px;
+}
+
+.toggle input:checked + .toggle-track { background: var(--accent); }
+
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(14px);
+  background: #000;
+}
+
+.toggle-small input:checked + .toggle-track::after {
+  transform: translateX(11px);
+}
+
+/* ── Empty State ───────────────────────────────────────── */
+
+.empty-state {
+  padding: 28px 20px;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.empty-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+  opacity: 0.4;
+}
+
+.empty-state p { font-size: 11.5px; color: var(--text-dim); }
+.empty-sub { font-size: 10px !important; margin-top: 4px; font-family: var(--mono); }
+
+/* ── Status Bar ────────────────────────────────────────── */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.status-url {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.status-active {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* ── Toast ─────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--bg3);
+  border: 1px solid var(--border-bright);
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--text-bright);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.success { border-color: var(--accent); color: var(--accent); }
+.toast.error { border-color: var(--danger); color: var(--danger); }

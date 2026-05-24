@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jamu Loader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <span class="logo-bracket"></span>
+          <img src="/icons/icon48.png" alt="ML Icon" class="logo-image" />
+          <span class="logo-text" style="display:none;">JL</span>
+          <span class="logo-bracket"></span>
+        </div>
+        <div class="header-info">
+          <span class="title">Jamu Loader</span>
+          <div class="subtitle-row">
+            <span class="subtitle" id="module-count">Loading...</span>
+            <!--
+              Indikator custom manifest — hanya muncul jika custom manifest
+              terisi dan aktif. Dot kecil berwarna aksen dengan label "custom"
+              agar tidak mencolok tapi tetap informatif bagi admin.
+            -->
+            <span id="custom-manifest-indicator" class="custom-indicator hidden" title="Custom manifest aktif">⬡ custom</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="btn-refresh" class="icon-btn" title="Refresh manifest">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M23 4v6h-6M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </button>
+        <button id="btn-settings" class="icon-btn" title="Settings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Version Blocked Banner -->
+    <div id="version-blocked-banner" class="version-blocked-banner hidden">
+      <div class="version-blocked-inner">
+        <span class="version-blocked-icon">⛔</span>
+        <div class="version-blocked-text">
+          <strong>Extension perlu diperbarui</strong>
+          <span id="version-blocked-detail"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Banner -->
+    <div id="update-banner" class="update-banner hidden">
+      <div class="update-banner-inner">
+        <span class="update-icon">⚡</span>
+        <span id="update-banner-text">Updates available</span>
+        <button id="btn-update-all" class="update-btn">Update All</button>
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="settings-panel hidden">
+      <div class="settings-content">
+
+        <!-- Info versi extension — dibaca dari manifest.json via chrome API -->
+        <div class="settings-version-row">
+          <span class="settings-label">Extension</span>
+          <span id="settings-version" class="settings-version-badge">v—</span>
+        </div>
+
+        <!-- Status koneksi default manifest -->
+        <div class="settings-status-row">
+          <span class="settings-label">Default Manifest</span>
+          <span id="manifest-status-badge" class="status-badge">—</span>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- Custom Manifest URL -->
+        <div class="settings-custom-header">
+          <span class="settings-label">Custom Manifest URL</span>
+          <!--
+            Toggle ini mengontrol apakah custom manifest diaktifkan.
+            Terpisah dari input URL sehingga admin bisa menyimpan URL
+            tanpa harus menghapusnya saat ingin menonaktifkan sementara.
+          -->
+          <label class="toggle toggle-small" title="Aktifkan/nonaktifkan custom manifest">
+            <input type="checkbox" id="custom-manifest-toggle" />
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="input-row">
+          <input
+            type="url"
+            id="manifest-url-input"
+            class="url-input"
+            placeholder="https://raw.githubusercontent.com/..."
+          />
+          <button id="btn-save-url" class="save-btn">Save</button>
+        </div>
+        <div class="settings-meta">
+          <span id="last-fetched">Never synced</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Module List -->
+    <div id="module-list" class="module-list">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">◈</div>
+        <p>No manifest configured</p>
+        <p class="empty-sub">Click ⚙ to set your manifest URL</p>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="current-url" class="status-url">—</span>
+      <span id="active-count" class="status-active"></span>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
