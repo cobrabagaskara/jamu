@@ -59,6 +59,7 @@ let state = {
   currentTabUrl: "",
   versionBlocked: false,
   versionRequired: null,
+  searchQuery: "",
   // TAMBAHAN: status custom manifest
   // customManifestEnabled: boolean — apakah custom manifest diaktifkan user
   // hasCustomManifest: boolean — apakah URL custom manifest sudah diisi
@@ -174,7 +175,29 @@ function render() {
     return;
   }
 
-  modules.forEach((mod) => {
+  // Filter modul berdasarkan search query
+  const filteredModules = state.searchQuery
+    ? modules.filter((mod) => {
+        const query = state.searchQuery.toLowerCase();
+        const name = (mod.name || mod.id).toLowerCase();
+        const version = (mod.version || "").toLowerCase();
+        const matches = (mod.matches || []).join(" ").toLowerCase();
+        return name.includes(query) || version.includes(query) || matches.includes(query);
+      })
+    : modules;
+
+  // Tampilkan empty state jika tidak ada hasil pencarian
+  if (filteredModules.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">◈</div>
+        <p>No modules found</p>
+        <p class="empty-sub">Try different keywords or clear search</p>
+      </div>`;
+    return;
+  }
+
+  filteredModules.forEach((mod) => {
     const enabled   = moduleStates[mod.id] !== false;
     const hasUpdate = pendingUpdates.includes(mod.id);
 
@@ -356,6 +379,31 @@ $("btn-update-all").addEventListener("click", async () => {
     $("btn-update-all").textContent = "Update All";
     $("btn-update-all").disabled = false;
   }
+});
+
+// ── Search Functionality ──────────────────────────────────────
+
+const searchInput = $("search-input");
+const clearSearchBtn = $("btn-clear-search");
+
+// Input handler - filter saat mengetik
+searchInput.addEventListener("input", (e) => {
+  state.searchQuery = e.target.value.trim();
+  
+  // Tampilkan/sembunyikan tombol clear berdasarkan ada tidaknya teks
+  clearSearchBtn.classList.toggle("hidden", !state.searchQuery);
+  
+  // Re-render untuk menampilkan hasil filter
+  render();
+});
+
+// Clear button handler
+clearSearchBtn.addEventListener("click", () => {
+  state.searchQuery = "";
+  searchInput.value = "";
+  clearSearchBtn.classList.add("hidden");
+  searchInput.focus();
+  render();
 });
 
 // ── Init ─────────────────────────────────────────────────────
